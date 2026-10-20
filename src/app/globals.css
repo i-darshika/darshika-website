@@ -1,0 +1,207 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #100f0f;
+  --bg-deep: #0d0d0d;
+  --card: #1e1d1e;
+  --light: #e1e1e1;
+  --light-2: #ebebeb;
+  --light-3: #d9d9d9;
+  --ink: #0e0f11;
+  --ink-soft: #4d4949;
+  --fg: #ffffff;
+  --muted: #a4a4a4;
+  --muted-2: #c6c6c6;
+  --accent: #d0ff71;
+  --line: rgba(255, 255, 255, 0.15);
+  --line-soft: rgba(255, 255, 255, 0.1);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-deep: var(--bg-deep);
+  --color-card: var(--card);
+  --color-light: var(--light);
+  --color-light-2: var(--light-2);
+  --color-light-3: var(--light-3);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-muted-2: var(--muted-2);
+  --color-accent: var(--accent);
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+  --font-sans: var(--font-outfit);
+  --font-nav: var(--font-inter);
+  --font-script: var(--font-sacramento);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-outfit), system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--ink);
+}
+
+/* 1320px content box with the theme's 12px inner gutter (in a layer so utilities can override it) */
+@layer components {
+  .wrap {
+    width: 100%;
+    max-width: 1320px;
+    margin-inline: auto;
+    padding-inline: 16px;
+  }
+
+  @media (min-width: 1024px) {
+    .wrap {
+      padding-inline: 12px;
+    }
+  }
+}
+
+/* Animated titles wait for GSAP; without JS (or reduced motion) they render normally. */
+.js [data-anim="chars"] {
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-anim="chars"] {
+    visibility: visible;
+  }
+}
+
+/* Cursor ring grows over interactive elements */
+.cursor-hover .cursor-outer {
+  width: 70px;
+  height: 70px;
+  margin: -35px 0 0 -35px;
+  border-color: var(--accent);
+}
+
+.cursor-hover .cursor-inner {
+  background: var(--accent);
+}
+
+.outline-text {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.4);
+}
+
+.outline-ink {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--ink);
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee {
+  animation: marquee 80s linear infinite;
+}
+
+.marquee-slow {
+  animation: marquee 60s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee,
+  .marquee-slow {
+    animation: none;
+  }
+}
+
+/* WordPress post bodies rendered from the CMS export */
+.prose-wp {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 27px;
+}
+
+.prose-wp h1,
+.prose-wp h2,
+.prose-wp h3,
+.prose-wp h4 {
+  color: var(--fg);
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0 0 10px;
+}
+
+.prose-wp h2 {
+  font-size: 30px;
+}
+
+.prose-wp h3 {
+  font-size: 28px;
+}
+
+.prose-wp h4 {
+  font-size: 20px;
+}
+
+.prose-wp p,
+.prose-wp ul,
+.prose-wp ol {
+  margin: 0 0 20px;
+}
+
+.prose-wp hr {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 30px 0;
+}
+
+.prose-wp ul {
+  list-style: disc;
+  padding-left: 1.4em;
+}
+
+.prose-wp ol {
+  list-style: decimal;
+  padding-left: 1.4em;
+}
+
+.prose-wp strong {
+  color: var(--fg);
+}
+
+.prose-wp a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prose-wp img {
+  border-radius: 15px;
+  margin: 1.5em 0;
+  height: auto;
+}
+
+.prose-wp table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+}
+
+.prose-wp th,
+.prose-wp td {
+  border: 1px solid var(--line);
+  padding: 10px 12px;
+  text-align: left;
+}
