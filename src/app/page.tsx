@@ -6,8 +6,7 @@ import { DotTags, SectionHead, WordMarquee } from "@/components/Blocks";
 import { ArrowUpRight } from "@/components/Icons";
 
 export default function Home() {
-  // Homepage blog row shows the oldest post first, as on the live site.
-  const blog = [...postsByDate].reverse();
+  const blog = postsByDate;
 
   return (
     <>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { postsByDate, formatDate } from "@/data/content";
 import { site } from "@/data/site";
 import { Search, Social } from "@/components/Icons";
+import ShareButtons from "@/components/ShareButtons";
 
 // Title + author row shared by blog posts and portfolio case studies.
 // The title block is bottom-anchored so one- and two-line titles end at the same height.
@@ -72,7 +73,7 @@ export function Sidebar() {
       <div className="border-t border-white/[0.08] pt-[21px]">
         <h2 className="text-[22px] font-medium">Latest Posts</h2>
         <ul className="mt-[30px] space-y-[30px]">
-          {[...postsByDate].reverse().map((p) => {
+          {postsByDate.map((p) => {
             const d = new Date(p.date);
             return (
               <li key={p.slug} className="flex gap-[25px]">
@@ -109,7 +110,7 @@ export function RecentNews() {
           </Link>
         </div>
         <div className="mt-[90px] grid gap-[100px] md:grid-cols-3">
-          {[...postsByDate].reverse().map((p) => (
+          {postsByDate.map((p) => (
             <Link key={p.slug} href={`/${p.slug}`} className="group block">
               <div className="flex items-center justify-between text-[13px] uppercase">
                 <span className="flex items-center gap-2">
@@ -136,18 +137,7 @@ export function ShareRow() {
       <p className="text-sm text-white/70">Tags :</p>
       <div className="flex items-center gap-[5px]">
         <span className="mr-1 text-sm text-white/70">Share :</span>
-        {site.socials.map((s) => (
-          <a
-            key={s.label}
-            href={s.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={s.label}
-            className="flex h-[33px] w-[33px] items-center justify-center rounded-full bg-white/[0.02] hover:text-accent"
-          >
-            <Social label={s.label} className="h-3.5 w-3.5" />
-          </a>
-        ))}
+        <ShareButtons />
       </div>
     </div>
   );
