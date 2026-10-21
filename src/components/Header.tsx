@@ -20,6 +20,30 @@ export default function Header() {
   const [open, setOpen] = useState(false),
     [searchOpen, setSearchOpen] = useState(false),
     [query, setQuery] = useState("");
+  const [scrolled, setScrolled] = useState(false);
+  const progressRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    let frame = 0;
+    const update = () => {
+      setScrolled(window.scrollY > 24);
+      const range = document.documentElement.scrollHeight - window.innerHeight;
+      if (progressRef.current) {
+        progressRef.current.style.transform = `scaleX(${range > 0 ? Math.min(1, Math.max(0, window.scrollY / range)) : 0})`;
+      }
+    };
+    const schedule = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, [pathname]);
   const menuRef = useRef<HTMLButtonElement>(null),
     dialogRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -80,7 +104,9 @@ export default function Header() {
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>
-      <header className="site-header">
+      <header
+        className={`site-header floating-header${scrolled ? " is-scrolled" : ""}`}
+      >
         <div className="wrap header-inner">
           <Link href="/" aria-label="Darshika home" className="brand-link">
             <Image
@@ -128,6 +154,9 @@ export default function Header() {
               <span />
               <span />
             </button>
+          </div>
+          <div className="header-progress-track" aria-hidden="true">
+            <div ref={progressRef} className="header-progress" />
           </div>
         </div>
       </header>

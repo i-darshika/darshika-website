@@ -2960,3 +2960,219 @@ em {
     padding-inline: 20px;
   }
 }
+/* Floating navigation stays within reach as the page scrolls. */
+.floating-header {
+  position: sticky;
+  top: 0;
+  z-index: 80;
+  padding-block: 16px;
+  background: transparent;
+  isolation: isolate;
+}
+.floating-header .header-inner {
+  position: relative;
+  width: min(100% - 64px, 1280px);
+  height: 76px;
+  padding-inline: 28px;
+  gap: 24px;
+  border: 1px solid #ffffff26;
+  border-radius: 100px;
+  background: linear-gradient(120deg, #24252df2, #191b22ed);
+  box-shadow:
+    0 8px 35px #00000014,
+    inset 0 1px 0 #ffffff08;
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  transition:
+    height 0.25s,
+    border-color 0.25s,
+    box-shadow 0.25s;
+}
+.floating-header.is-scrolled .header-inner {
+  height: 66px;
+  border-color: #c8b6ef45;
+  box-shadow:
+    0 14px 45px #0005,
+    inset 0 1px 0 #ffffff0a;
+}
+.floating-header .brand-link {
+  gap: 9px;
+  padding-right: 24px;
+  border-right: 1px solid var(--line);
+}
+.floating-header .brand-link img {
+  width: 126px;
+  height: 27px;
+}
+.floating-header .brand-dot {
+  width: 8px;
+  height: 8px;
+  margin-top: 7px;
+  box-shadow: 0 0 0 4px #c8b6ef10;
+}
+.floating-header .desktop-nav {
+  margin: auto;
+  gap: 3px;
+  padding: 4px;
+  border-radius: 60px;
+  background: #ffffff04;
+}
+.floating-header .desktop-nav a {
+  padding: 9px 16px;
+  font-size: 12px;
+  border-radius: 40px;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.floating-header .desktop-nav a:hover {
+  color: var(--fg);
+  background: #ffffff09;
+}
+.floating-header .desktop-nav a[aria-current] {
+  background: var(--accent);
+  color: var(--ink);
+  box-shadow: 0 2px 9px #0002;
+}
+.floating-header .desktop-nav a[aria-current]::after {
+  display: none;
+}
+.floating-header .header-actions {
+  gap: 10px;
+}
+.floating-header .search-toggle {
+  width: 37px;
+  height: 37px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.floating-header .search-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+.floating-header .search-toggle:hover {
+  background: var(--accent);
+  color: var(--ink);
+}
+.floating-header .header-contact {
+  padding: 11px 17px;
+  background: var(--accent);
+  color: var(--ink);
+  border: 0;
+  border-radius: 40px;
+  font-size: 12px;
+  gap: 16px;
+}
+.floating-header .header-contact svg {
+  transition: transform 0.2s;
+}
+.floating-header .header-contact:hover svg {
+  transform: rotate(45deg);
+}
+.header-progress-track {
+  position: absolute;
+  bottom: 0;
+  left: 35px;
+  right: 35px;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 10px;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.is-scrolled .header-progress-track {
+  opacity: 0.8;
+}
+.header-progress {
+  height: 100%;
+  background: linear-gradient(90deg, #c8b6ef00, var(--accent));
+  transform: scaleX(0);
+  transform-origin: left;
+  will-change: transform;
+}
+.floating-header .menu-toggle {
+  width: 38px;
+  height: 38px;
+  background: #ffffff05;
+}
+@media (max-width: 1100px) {
+  .floating-header .header-inner {
+    padding-inline: 22px;
+    gap: 16px;
+  }
+  .floating-header .brand-link {
+    padding-right: 18px;
+  }
+  .floating-header .desktop-nav a {
+    padding-inline: 12px;
+  }
+}
+@media (max-width: 800px) {
+  .floating-header {
+    padding-block: 12px;
+  }
+  .floating-header .header-inner {
+    width: calc(100% - 40px);
+    height: 70px;
+    padding-inline: 22px;
+    justify-content: space-between;
+  }
+  .floating-header .brand-link {
+    border-right: 0;
+    padding-right: 0;
+  }
+  .floating-header.is-scrolled .header-inner {
+    height: 64px;
+  }
+  .floating-header .header-actions {
+    margin-left: auto;
+    gap: 12px;
+  }
+  .floating-header .header-contact {
+    display: flex;
+  }
+  .header-progress-track {
+    left: 28px;
+    right: 28px;
+  }
+}
+@media (max-width: 600px) {
+  .floating-header {
+    padding-block: 9px;
+  }
+  .floating-header .header-inner {
+    width: calc(100% - 24px);
+    height: 64px;
+    padding-inline: 18px;
+    gap: 14px;
+  }
+  .floating-header.is-scrolled .header-inner {
+    height: 60px;
+  }
+  .floating-header .brand-link img {
+    width: 113px;
+    height: 25px;
+  }
+  .floating-header .brand-dot {
+    width: 6px;
+    height: 6px;
+  }
+  .floating-header .header-contact {
+    display: none;
+  }
+  .floating-header .header-actions {
+    gap: 9px;
+  }
+  .floating-header .search-toggle,
+  .floating-header .menu-toggle {
+    width: 36px;
+    height: 36px;
+  }
+  .header-progress-track {
+    left: 25px;
+    right: 25px;
+  }
+}
