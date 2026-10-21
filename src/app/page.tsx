@@ -9,9 +9,35 @@ import {
   skills,
   traits,
 } from "@/data/site";
-import { postsByDate } from "@/data/content";
+import { formatDate, postsByDate } from "@/data/content";
 import { DotTags, SectionHead, WordMarquee } from "@/components/Blocks";
 import { ArrowUpRight } from "@/components/Icons";
+import { BlogTabs, type BlogTab } from "@/components/BlogTabs";
+
+const decode = (t: string) =>
+  t.replace(/&amp;/g, "&").replace(/&#8217;|&rsquo;/g, "’").replace(/&nbsp;/g, " ").replace(/&[a-z0-9#]+;/gi, "");
+
+// Summary data for the blog tabs: trimmed excerpt, read time and the article's section headings.
+const blogTabs: BlogTab[] = postsByDate.map((p) => {
+  const words = p.html.replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length;
+  const raw = decode(p.excerpt.replace(/\s*(…|\[…\]|\.\.\.)\s*$/, "")).trim();
+  // End on the last full sentence (a period after a letter, so "1." list markers don't count).
+  const ends = [...raw.matchAll(/[A-Za-z’)]\.(?=\s|$)/g)].map((m) => (m.index ?? 0) + 2);
+  const cut = ends.length ? ends[ends.length - 1] : 0;
+  const excerpt = cut > 120 ? raw.slice(0, cut) : `${raw}…`;
+  const topics = [...p.html.matchAll(/<h2[^>]*>([\s\S]*?)<\/h2>/g)]
+    .map((m) => decode(m[1].replace(/<[^>]+>/g, "")).replace(/^\d+\.\s*/, "").trim())
+    .filter((t) => t && !/^(introduction|conclusion)$/i.test(t))
+    .slice(0, 4);
+  return {
+    slug: p.slug,
+    title: p.title,
+    date: formatDate(p.date, "short"),
+    readTime: Math.max(1, Math.round(words / 200)),
+    excerpt,
+    topics,
+  };
+});
 
 export default function Home() {
   return (
@@ -247,20 +273,7 @@ export default function Home() {
           }
           link={{ label: "View All Blogs", href: "/blog" }}
         />
-        <div className="news-grid">
-          {postsByDate.map((p) => (
-            <Link href={`/${p.slug}`} key={p.slug} className="news-card">
-              <div className="news-image">
-                <Image src={p.image} alt={p.title} width={500} height={360} />
-                <span className="image-arrow">
-                  <ArrowUpRight />
-                </span>
-              </div>
-              <p className="eyebrow">Blog</p>
-              <h3>{p.title}</h3>
-            </Link>
-          ))}
-        </div>
+        <BlogTabs posts={blogTabs} />
       </section>
     </>
   );
