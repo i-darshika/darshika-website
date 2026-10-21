@@ -39,7 +39,9 @@ export default function RootLayout({
         <Header />
         <div id="smooth-wrapper">
           <div id="smooth-content">
-            <main id="main-content">{children}</main>
+            <main id="main-content" tabIndex={-1}>
+              {children}
+            </main>
             <Footer />
           </div>
         </div>
