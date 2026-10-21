@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Darshika website
 
-## Getting Started
+Portfolio website built with Next.js, React, Tailwind CSS and Lenis.
 
-First, run the development server:
+## Local development
 
-```bash
+```sh
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Checks and production build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```sh
+npm run lint
+npm run build
+```
 
-## Learn More
+The static website is exported to `out/`. Cloudflare Pages builds and deploys pushes to `main` using `npm run build` and the `out` directory.
 
-To learn more about Next.js, take a look at the following resources:
+## Project files
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `src/app/`: pages, layouts and shared styles.
+- `src/components/`: reusable interface components.
+- `src/data/`: website copy, blog content and portfolio data.
+- `public/wp/`: referenced images and media.
+- `public/_redirects`: redirects for legacy URLs.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The contact form uses FormSubmit. Its recipient address is configured in `src/data/site.ts`.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+`node_modules/`, `.next/`, `out/` and `*.tsbuildinfo` are generated locally and excluded from Git. Keep `package-lock.json` for reproducible installs.
