@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight } from "@/components/Icons";
 
-// Section opener used across the site: thin rule, label row, then a heading offset to the second column.
 export function SectionHead({
   label,
   tag,
@@ -19,78 +18,82 @@ export function SectionHead({
   tone?: "dark" | "light";
   className?: string;
 }) {
-  const ink = tone === "light" ? "text-ink" : "text-white";
   return (
-    <div className={`border-t pt-[31px] ${tone === "light" ? "border-black/15" : "border-line"} ${className}`}>
-      <div className={`flex items-start justify-between gap-6 ${ink}`}>
-        <h2 className="text-base uppercase leading-[1.4]">{label}</h2>
-        <p className="text-sm font-medium uppercase tracking-[2px]">
-          {"{ "}
-          <span className="font-normal">{tag}</span>
-          {" }"}
-        </p>
+    <div
+      className={`section-heading ${tone === "light" ? "heading-light" : ""} ${className}`}
+    >
+      <div className="section-kicker">
+        <span className="eyebrow">{label}</span>
+        <span className="section-tag">{tag}</span>
       </div>
-      <div className={`mt-12 flex flex-col gap-8 lg:mt-[60px] lg:flex-row lg:gap-[30px] lg:pl-[333px] ${ink}`}>
-        <div className={aside ? "lg:w-[520px]" : "lg:w-[740px]"}>
-          <h2 className="text-[40px] font-medium leading-[1.2] md:text-[54px]">{title}</h2>
+      <div className="section-heading-body">
+        <h2>{title}</h2>
+        <div className="section-heading-aside">
+          {aside && <p>{aside}</p>}
           {link && (
-            <Link href={link.href} className="group mt-4 inline-flex items-center gap-2 text-[15px] font-light">
-              <span className="border-b border-current pb-0.5">{link.label}</span>
-              <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            <Link className="text-link" href={link.href}>
+              {link.label}
+              <ArrowUpRight />
             </Link>
           )}
         </div>
-        {aside && <div className="text-lg leading-[1.4] lg:w-[410px]">{aside}</div>}
       </div>
     </div>
   );
 }
-
-// Big inner-page title with the optional "( Pages - Current )" breadcrumb.
 export function PageTitle({ title, crumb }: { title: string; crumb?: string }) {
   return (
-    <section className="wrap pt-[150px] lg:pt-[180px]">
-      <h1 data-anim="chars" className="text-center text-[56px] font-medium leading-[1.2] sm:text-[80px] lg:text-[110px]">
-        {title}
-      </h1>
+    <section className="page-title wrap">
+      <div className="page-title-top">
+        <span className="eyebrow">Darshika Raj</span>
+        <span className="title-star" aria-hidden>
+          ✳
+        </span>
+      </div>
+      <h1>{title}</h1>
       {crumb && (
-        <p className="mt-5 text-center text-base uppercase">
-          ( <Link href="/" className="hover:text-accent">Pages</Link> <span className="mx-1">-</span>{" "}
-          <span className="text-accent">{crumb}</span> )
+        <p className="page-crumb">
+          ( <Link href="/">Pages</Link>
+          <span>—</span>
+          {crumb} )
         </p>
       )}
+      <div className="page-title-rule" />
     </section>
   );
 }
-
-// Inline row of small tags separated by dots, as on the services lists.
-export function DotTags({ tags, className = "" }: { tags: string[]; className?: string }) {
+export function DotTags({
+  tags,
+  className = "",
+}: {
+  tags: string[];
+  className?: string;
+}) {
   return (
-    <div className={`flex flex-wrap items-center gap-x-[18px] gap-y-2 text-sm font-light ${className}`}>
+    <div className={`dot-tags ${className}`}>
       {tags.map((t, i) => (
-        <span key={t + i} className="flex items-center gap-[18px]">
-          {i > 0 && <span className="h-[5px] w-[5px] rounded-full bg-current opacity-60" aria-hidden />}
-          {t}
-        </span>
+        <span key={t + i}>{t}</span>
       ))}
     </div>
   );
 }
-
-// Infinite horizontal strip of huge words, alternating solid and outlined.
-export function WordMarquee({ words, tone = "dark" }: { words: string[]; tone?: "dark" | "light" }) {
-  const row = [...words, ...words, ...words];
+export function WordMarquee({
+  words,
+  tone = "dark",
+}: {
+  words: string[];
+  tone?: "dark" | "light";
+}) {
   return (
-    <div className="overflow-hidden" aria-label={words.join(", ")}>
-      <div className="marquee flex w-max gap-[50px]" aria-hidden>
-        {[...row, ...row].map((w, i) => (
-          <span
-            key={i}
-            className={`whitespace-nowrap text-[72px] font-semibold leading-[1.2] md:text-[144px] ${
-              i % 2 ? (tone === "light" ? "outline-ink" : "outline-text") : tone === "light" ? "text-black" : "text-white"
-            }`}
-          >
+    <div
+      className={`word-marquee ${tone === "light" ? "text-ink" : ""}`}
+      aria-label={words.join(", ")}
+    >
+      <div className="marquee" aria-hidden>
+        {[...words, ...words, ...words, ...words].map((w, i) => (
+          <span key={i}>
             {w}
+            <span className="marquee-star">✳</span>
           </span>
         ))}
       </div>

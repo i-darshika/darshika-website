@@ -1,154 +1,211 @@
 "use client";
-
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { nav, site } from "@/data/site";
-import { Search } from "@/components/Icons";
+import { ArrowUpRight, Search } from "@/components/Icons";
 
-function isActive(pathname: string, href: string) {
-  if (href === "/") return pathname === "/";
-  if (href === "/digital-marketing-portfolio") return pathname.startsWith(href) || pathname.startsWith("/portfolio");
-  if (href === "/digital-marketing-services") return pathname.startsWith(href) || /-services?$/.test(pathname);
-  return pathname.startsWith(href);
+function isActive(path: string, href: string) {
+  if (href === "/") return path === "/";
+  if (href === "/digital-marketing-portfolio")
+    return path.startsWith(href) || path.startsWith("/portfolio");
+  if (href === "/digital-marketing-services")
+    return path.startsWith(href) || /-services?$/.test(path);
+  return path.startsWith(href);
 }
-
 export default function Header() {
-  const pathname = usePathname();
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [query, setQuery] = useState("");
-  const [stuck, setStuck] = useState(false);
-  const [hidden, setHidden] = useState(false);
-
+  const pathname = usePathname(),
+    router = useRouter();
+  const [open, setOpen] = useState(false),
+    [searchOpen, setSearchOpen] = useState(false),
+    [query, setQuery] = useState("");
+  const menuRef = useRef<HTMLButtonElement>(null),
+    dialogRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     setOpen(false);
     setSearchOpen(false);
   }, [pathname]);
-
-  // Past 280px the header becomes sticky; it slides away on scroll down and returns on scroll up.
   useEffect(() => {
-    let last = window.scrollY;
-    const onScroll = () => {
-      const y = window.scrollY;
-      setStuck(y > 280);
-      setHidden(y > 280 && y > last);
-      last = y;
+    if (!open && !searchOpen) return;
+    const original = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const key = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        setSearchOpen(false);
+        menuRef.current?.focus();
+      }
+      if (e.key === "Tab" && dialogRef.current) {
+        const nodes = Array.from(
+          dialogRef.current.querySelectorAll<HTMLElement>(
+            "a[href],button,input",
+          ),
+        ).filter((el) => el.offsetParent !== null);
+        const first = nodes[0],
+          last = nodes[nodes.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last?.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first?.focus();
+        }
+      }
     };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  const submitSearch = (e: React.FormEvent) => {
+    document.addEventListener("keydown", key);
+    const t = setTimeout(
+      () =>
+        dialogRef.current
+          ?.querySelector<HTMLElement>("input,button,a")
+          ?.focus(),
+      60,
+    );
+    return () => {
+      document.body.style.overflow = original;
+      document.removeEventListener("keydown", key);
+      clearTimeout(t);
+    };
+  }, [open, searchOpen]);
+  const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (query.trim()) router.push(`/blog?s=${encodeURIComponent(query.trim())}`);
+    if (query.trim()) {
+      router.push(`/blog?s=${encodeURIComponent(query.trim())}`);
+      setSearchOpen(false);
+      setOpen(false);
+    }
   };
-
   return (
     <>
-      <header
-        className={`left-0 right-0 z-50 transition-[transform,background-color,padding] duration-300 ${
-          stuck ? "fixed top-0 bg-bg/90 py-3 backdrop-blur" : "absolute top-0 pt-[30px]"
-        } ${hidden && !open && !searchOpen ? "-translate-y-full" : "translate-y-0"}`}
-      >
-        <div className="wrap flex items-center justify-between gap-4">
-          <div className="flex items-center gap-[15px]">
-            <Link
-              href="/"
-              aria-label="Darshika home"
-              className="flex h-[43px] w-[192px] items-center justify-center rounded-[30px] border border-white/30"
-            >
-              <Image src={site.logo} alt="Darshika" width={160} height={24} priority className="h-6 w-40 object-contain" />
-            </Link>
-            <nav className="hidden h-11 items-center rounded-[30px] border border-white/30 px-[5px] lg:flex">
-              {nav.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex h-[38px] items-center rounded-[30px] px-5 font-nav text-sm transition-colors hover:bg-white/10 ${
-                    isActive(pathname, item.href) ? "bg-white/10" : ""
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/contact"
-              className="hidden h-[42px] items-center rounded-[30px] bg-white px-5 font-nav text-sm font-medium text-[#1d1d1d] transition-transform hover:-translate-y-0.5 sm:flex"
-            >
-              Contact
-            </Link>
+      <a className="skip-link" href="#main-content">
+        Skip to content
+      </a>
+      <header className="site-header">
+        <div className="wrap header-inner">
+          <Link href="/" aria-label="Darshika home" className="brand-link">
+            <Image
+              src={site.logo}
+              alt="Darshika"
+              width={160}
+              height={32}
+              priority
+            />
+            <span className="brand-dot" aria-hidden />
+          </Link>
+          <nav className="desktop-nav" aria-label="Main navigation">
+            {nav.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={
+                  isActive(pathname, item.href) ? "page" : undefined
+                }
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+          <div className="header-actions">
             <button
-              type="button"
+              className="search-toggle"
+              onClick={() => setSearchOpen(true)}
               aria-label="Search"
-              onClick={() => setSearchOpen((v) => !v)}
-              className="hidden h-[42px] w-[42px] items-center justify-center rounded-full text-white hover:text-accent sm:flex"
             >
               <Search />
             </button>
+            <Link className="header-contact" href="/contact">
+              Contact
+              <ArrowUpRight />
+            </Link>
             <button
-              type="button"
-              aria-label={open ? "Close menu" : "Open menu"}
+              ref={menuRef}
+              className="menu-toggle"
               aria-expanded={open}
-              onClick={() => setOpen((v) => !v)}
-              className="flex h-[43px] w-[43px] flex-col items-center justify-center gap-[5px] rounded-full border border-white/30 lg:hidden"
+              aria-controls="mobile-navigation"
+              aria-label="Open menu"
+              onClick={() => setOpen(true)}
             >
-              <span className={`h-px w-5 bg-white transition ${open ? "translate-y-[6px] rotate-45" : ""}`} />
-              <span className={`h-px w-5 bg-white transition ${open ? "opacity-0" : ""}`} />
-              <span className={`h-px w-5 bg-white transition ${open ? "-translate-y-[6px] -rotate-45" : ""}`} />
+              <span />
+              <span />
             </button>
           </div>
         </div>
-
-        {searchOpen && (
-          <form onSubmit={submitSearch} className="wrap mt-4">
-            <input
-              autoFocus
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search articles…"
-              aria-label="Search articles"
-              className="h-14 w-full rounded-full border border-white/40 bg-bg px-6 text-white outline-none placeholder:text-muted focus:border-accent"
-            />
-          </form>
-        )}
       </header>
-
-      {/* Off-canvas menu for small screens */}
-      <div
-        className={`fixed inset-0 z-40 flex flex-col bg-bg px-4 pb-10 pt-28 transition-transform duration-500 lg:hidden ${
-          open ? "translate-x-0" : "translate-x-full"
-        }`}
-        aria-hidden={!open}
-      >
-        <nav className="flex flex-col">
-          {nav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              tabIndex={open ? 0 : -1}
-              className={`border-b border-line-soft py-4 text-4xl font-medium ${isActive(pathname, item.href) ? "text-accent" : ""}`}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-        <div className="mt-auto">
-          <p className="text-4xl font-medium leading-tight">
-            I would be delighted to <span className="font-script text-5xl text-accent">help</span> you create your brand!
-          </p>
-          <a href={`mailto:${site.email}`} tabIndex={open ? 0 : -1} className="mt-6 block text-lg text-muted-2">
-            {site.email}
-          </a>
+      {(open || searchOpen) && (
+        <div
+          ref={dialogRef}
+          className="navigation-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label={searchOpen ? "Search articles" : "Navigation"}
+        >
+          <div className="wrap">
+            <div className="overlay-top">
+              <span className="eyebrow">Darshika</span>
+              <button
+                className="overlay-close"
+                onClick={() => {
+                  setOpen(false);
+                  setSearchOpen(false);
+                  menuRef.current?.focus();
+                }}
+                aria-label="Close menu"
+              >
+                ×
+              </button>
+            </div>
+            {searchOpen ? (
+              <form onSubmit={submit} className="overlay-search">
+                <label htmlFor="article-search">Search articles</label>
+                <div>
+                  <input
+                    id="article-search"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search articles…"
+                  />
+                  <button aria-label="Search" type="submit">
+                    <ArrowUpRight />
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <>
+                <nav id="mobile-navigation" className="mobile-nav">
+                  {nav.map((item, i) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setOpen(false)}
+                      aria-current={
+                        isActive(pathname, item.href) ? "page" : undefined
+                      }
+                    >
+                      <span aria-hidden>0{i + 1}</span>
+                      {item.label}
+                      <ArrowUpRight />
+                    </Link>
+                  ))}
+                </nav>
+                <form onSubmit={submit} className="mobile-search">
+                  <input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    aria-label="Search articles"
+                    placeholder="Search articles…"
+                  />
+                  <button aria-label="Search">
+                    <Search />
+                  </button>
+                </form>
+                <a className="overlay-email" href={`mailto:${site.email}`}>
+                  {site.email}
+                </a>
+              </>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }

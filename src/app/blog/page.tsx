@@ -6,7 +6,11 @@ export const metadata: Metadata = { title: "Blog" };
 
 export default function BlogPage() {
   return (
-    <Suspense fallback={<section className="wrap py-[140px]">Loading articles…</section>}>
+    <Suspense
+      fallback={
+        <section className="wrap py-[140px]">Loading articles…</section>
+      }
+    >
       <BlogContent />
     </Suspense>
   );

@@ -1,15 +1,23 @@
 import type { Metadata } from "next";
-import { Inter, Outfit, Sacramento } from "next/font/google";
+import { Inter, Outfit, Cormorant_Garamond } from "next/font/google";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Motion from "@/components/Motion";
-import Cursor from "@/components/Cursor";
 import { site } from "@/data/site";
 import "./globals.css";
 
-const outfit = Outfit({ variable: "--font-outfit", subsets: ["latin"], weight: ["200", "300", "400", "500", "600", "700"] });
+const outfit = Outfit({
+  variable: "--font-outfit",
+  subsets: ["latin"],
+  weight: ["200", "300", "400", "500", "600", "700"],
+});
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
-const sacramento = Sacramento({ variable: "--font-sacramento", subsets: ["latin"], weight: "400" });
+const editorial = Cormorant_Garamond({
+  variable: "--font-editorial",
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  style: ["normal", "italic"],
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://darshikaraj.com"),
@@ -25,19 +33,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en-US" suppressHydrationWarning>
-      <head>
-        {/* Marks JS as available so animated titles can stay hidden until GSAP reveals them. */}
-        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
-      </head>
-      <body className={`${outfit.variable} ${inter.variable} ${sacramento.variable} antialiased`}>
+      <body
+        className={`${outfit.variable} ${inter.variable} ${editorial.variable} antialiased`}
+      >
         <Header />
         <div id="smooth-wrapper">
           <div id="smooth-content">
-            <main>{children}</main>
+            <main id="main-content">{children}</main>
             <Footer />
           </div>
         </div>
-        <Cursor />
+
         <Motion />
       </body>
     </html>
