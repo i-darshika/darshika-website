@@ -63,6 +63,7 @@ export const resume = [
   {
     label: "Education",
     items: [
+      { title: "MBA (Digital Marketing)", place: "DY Patil" },
       { title: "BBA (Hons)", place: "Chandigarh University" },
       { title: "Intermediate", place: "D.A.V Public" },
     ],

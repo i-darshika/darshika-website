@@ -1,10 +1,10 @@
 "use client";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { nav, site } from "@/data/site";
 import { ArrowUpRight, Search } from "@/components/Icons";
+import { Logo } from "@/components/Logo";
 
 function isActive(path: string, href: string) {
   if (href === "/") return path === "/";
@@ -43,6 +43,28 @@ export default function Header() {
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
     };
+  }, [pathname]);
+  // Sliding pill behind the active menu link (and a soft one following hover).
+  const navRef = useRef<HTMLElement>(null);
+  const [pill, setPill] = useState<{ x: number; w: number } | null>(null);
+  const [hover, setHover] = useState<{ x: number; w: number } | null>(null);
+  const measure = (el: HTMLElement) => {
+    const nav = navRef.current?.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    return { x: r.left - (nav?.left ?? 0), w: r.width };
+  };
+  useEffect(() => {
+    const navEl = navRef.current;
+    if (!navEl) return;
+    const place = () => {
+      const active = navEl.querySelector<HTMLElement>("a[aria-current]");
+      setPill(active && active.offsetParent ? measure(active) : null);
+    };
+    place();
+    document.fonts?.ready.then(place);
+    const ro = new ResizeObserver(place);
+    ro.observe(navEl);
+    return () => ro.disconnect();
   }, [pathname]);
   const menuRef = useRef<HTMLButtonElement>(null),
     dialogRef = useRef<HTMLDivElement>(null);
@@ -109,16 +131,29 @@ export default function Header() {
       >
         <div className="wrap header-inner">
           <Link href="/" aria-label="Darshika home" className="brand-link">
-            <Image
-              src={site.logo}
-              alt="Darshika"
-              width={160}
-              height={32}
-              priority
-            />
+            <Logo />
             <span className="brand-dot" aria-hidden />
           </Link>
-          <nav className="desktop-nav" aria-label="Main navigation">
+          <nav
+            ref={navRef}
+            className={`desktop-nav${pill ? " has-pill" : ""}`}
+            aria-label="Main navigation"
+            onMouseLeave={() => setHover(null)}
+          >
+            {pill && (
+              <span
+                className="nav-pill"
+                aria-hidden
+                style={{ transform: `translateX(${pill.x}px)`, width: pill.w }}
+              />
+            )}
+            {hover && (
+              <span
+                className="nav-hover"
+                aria-hidden
+                style={{ transform: `translateX(${hover.x}px)`, width: hover.w }}
+              />
+            )}
             {nav.map((item) => (
               <Link
                 key={item.href}
@@ -126,6 +161,9 @@ export default function Header() {
                 aria-current={
                   isActive(pathname, item.href) ? "page" : undefined
                 }
+                onMouseEnter={(e) => setHover(measure(e.currentTarget))}
+                onFocus={(e) => setHover(measure(e.currentTarget))}
+                onBlur={() => setHover(null)}
               >
                 {item.label}
               </Link>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { site } from "@/data/site";
 import { ArrowUpRight } from "@/components/Icons";
 
@@ -68,7 +69,7 @@ export default function ContactForm() {
         {busy ? "Sending…" : "Send message"}
         <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:rotate-45" />
       </button>
-      <p className="text-sm text-muted sm:col-span-2">Your details are processed by FormSubmit to deliver your enquiry by email.</p>
+      <p className="text-sm text-muted sm:col-span-2">Your details are processed by FormSubmit to deliver your enquiry by email. See the <Link href="/privacy-policy" className="text-accent underline underline-offset-4">Privacy Policy</Link>.</p>
       <p role={failed ? "alert" : "status"} className="text-sm sm:col-span-2">{status}</p>
       {failed && <a href={`mailto:${site.email}`} className="text-accent sm:col-span-2">Email {site.email}</a>}
     </form>

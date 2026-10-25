@@ -1,9 +1,40 @@
 import Link from "next/link";
-import { portfolio, servicesPage, type Project } from "@/data/content";
+import { portfolio, serviceDetails, servicesPage, type Project } from "@/data/content";
 import { ArrowUpRight } from "@/components/Icons";
 import ShareButtons from "@/components/ShareButtons";
 
 const pad = (n: number) => String(n).padStart(2, "0");
+
+// Project service names → the matching service page (for descriptions and links).
+const serviceSlug: Record<string, string> = {
+  social: "social-media-marketing-services",
+  search: "search-engine-optimization-service",
+  web: "website-development-services",
+  graphic: "graphic-designing-services",
+};
+const serviceFor = (title: string) =>
+  serviceDetails.find((d) => d.slug === serviceSlug[title.toLowerCase().split(" ")[0]]);
+const firstSentence = (t: string) => t.match(/^.*?[.!?](?=\s|$)/)?.[0] ?? t;
+
+// How each project was approached, step by step (wording adapts to the project).
+const approach = (p: Project, industry: string) => [
+  {
+    title: "Discover",
+    text: `Getting to know ${p.title}, its customers and the ${industry.toLowerCase()} market to find where the brand could stand out online.`,
+  },
+  {
+    title: "Strategy",
+    text: `Defining the brand direction, key messages and the channels — search, social and web — that would reach the right audience.`,
+  },
+  {
+    title: "Create",
+    text: `Designing the visual identity and producing the website, graphics and social content so every touchpoint feels consistent.`,
+  },
+  {
+    title: "Launch & grow",
+    text: `Publishing, monitoring performance and refining content and campaigns to keep the brand visible and engaging.`,
+  },
+];
 
 // Individual portfolio project: text-only case study with a spec sheet, overview,
 // services delivered, client testimonial (when there is one) and next/previous projects.
@@ -15,6 +46,9 @@ export function ProjectCaseStudy({ p }: { p: Project }) {
   const quote = servicesPage.testimonials.find((t) =>
     t.name.toLowerCase().replace(/^the\s+/, "").startsWith(firstWord),
   );
+  const industry = p.meta.find(([k]) => k === "Industry")?.[1] ?? "its";
+  const steps = approach(p, industry);
+  const more = [1, 2, 3].map((n) => portfolio[(index + n) % portfolio.length]);
 
   return (
     <>
@@ -67,6 +101,24 @@ export function ProjectCaseStudy({ p }: { p: Project }) {
         </aside>
       </section>
 
+      <section className="wrap section-space case-approach">
+        <div className="case-approach-head">
+          <p className="eyebrow">The approach</p>
+          <h2 className="svc-section-title">
+            How the project <em>came together</em>
+          </h2>
+        </div>
+        <ol className="case-steps">
+          {steps.map((st, i) => (
+            <li key={st.title}>
+              <span className="case-step-num">{pad(i + 1)}</span>
+              <h3>{st.title}</h3>
+              <p>{st.text}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
       <section className="wrap case-services">
         <div className="post-more-head">
           <h2 className="display-heading">
@@ -74,17 +126,27 @@ export function ProjectCaseStudy({ p }: { p: Project }) {
           </h2>
         </div>
         <div className="case-services-grid">
-          {p.services.map((s, i) => (
-            <article key={s.title} className="case-service">
-              <span className="case-service-num">{pad(i + 1)}</span>
-              <h3>{s.title}</h3>
-              <ul>
-                {s.items.map((it) => (
-                  <li key={it}>{it}</li>
-                ))}
-              </ul>
-            </article>
-          ))}
+          {p.services.map((s, i) => {
+            const d = serviceFor(s.title);
+            return (
+              <article key={s.title} className="case-service">
+                <span className="case-service-num">{pad(i + 1)}</span>
+                <h3>{s.title}</h3>
+                {d && <p className="case-service-text">{firstSentence(d.intro)}</p>}
+                <ul>
+                  {s.items.map((it) => (
+                    <li key={it}>{it}</li>
+                  ))}
+                </ul>
+                {d && (
+                  <Link href={`/${d.slug}`} className="case-service-link">
+                    About this service
+                    <ArrowUpRight />
+                  </Link>
+                )}
+              </article>
+            );
+          })}
         </div>
       </section>
 
@@ -103,7 +165,63 @@ export function ProjectCaseStudy({ p }: { p: Project }) {
         </section>
       )}
 
-      <section className={`wrap case-share${quote ? "" : " is-spaced"}`}>
+      <section className={`wrap case-about${quote ? "" : " is-spaced"}`}>
+        <div className="case-about-card">
+          <span className="post-avatar post-avatar-lg" aria-hidden>
+            DR
+          </span>
+          <div>
+            <p className="eyebrow">{p.aboutHeading}</p>
+            <p className="case-about-text">{p.aboutText}</p>
+          </div>
+          <div className="case-about-actions">
+            <Link href="/contact" className="button-primary">
+              Start a similar project
+              <ArrowUpRight />
+            </Link>
+            <Link href="/digital-marketing-services" className="text-link">
+              View services
+              <ArrowUpRight />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="wrap section-space case-more">
+        <div className="post-more-head">
+          <h2 className="display-heading">
+            More <em>projects</em>
+          </h2>
+          <Link href="/digital-marketing-portfolio" className="text-link">
+            All Projects
+            <ArrowUpRight />
+          </Link>
+        </div>
+        <div className="case-more-grid">
+          {more.map((m) => {
+            const mi = portfolio.indexOf(m);
+            return (
+              <Link key={m.slug} href={`/portfolio/${m.slug}`} className="case-more-card">
+                <div className="case-more-top">
+                  <span className="case-more-num" aria-hidden>
+                    {pad(mi + 1)}
+                  </span>
+                  <span className="case-more-arrow" aria-hidden>
+                    <ArrowUpRight />
+                  </span>
+                </div>
+                <h3>{m.title}</h3>
+                <p>
+                  {m.meta.find(([k]) => k === "Industry")?.[1]} ·{" "}
+                  {m.meta.find(([k]) => k === "Date")?.[1]}
+                </p>
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="wrap case-share">
         <p className="eyebrow">Share this project</p>
         <div>
           <ShareButtons />
