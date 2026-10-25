@@ -1,5 +1,14 @@
+import { Children, isValidElement, type ReactNode } from "react";
 import Link from "next/link";
 import { ArrowUpRight } from "@/components/Icons";
+
+// Plain-text length of a heading, so CSS can size it to fit on one line.
+const textLength = (node: ReactNode): number =>
+  Children.toArray(node).reduce<number>((n, c) => {
+    if (typeof c === "string" || typeof c === "number") return n + String(c).length;
+    if (isValidElement<{ children?: ReactNode }>(c)) return n + textLength(c.props.children);
+    return n;
+  }, 0);
 
 export function SectionHead({
   label,
@@ -27,7 +36,9 @@ export function SectionHead({
         <span className="section-tag">{tag}</span>
       </div>
       <div className="section-heading-body">
-        <h2>{title}</h2>
+        <div className="section-heading-title">
+          <h2 style={{ "--chars": textLength(title) } as React.CSSProperties}>{title}</h2>
+        </div>
         <div className="section-heading-aside">
           {aside && <p>{aside}</p>}
           {link && (
@@ -87,8 +98,8 @@ export function WordMarquee({
   return (
     <div
       className={`word-marquee ${tone === "light" ? "text-ink" : ""}`}
-      aria-label={words.join(", ")}
     >
+      <span className="sr-only">{words.join(", ")}</span>
       <div className="marquee" aria-hidden>
         {[...words, ...words, ...words, ...words].map((w, i) => (
           <span key={i}>

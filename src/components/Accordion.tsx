@@ -24,7 +24,7 @@ export function NumberedAccordion({ items, defaultOpen = 0 }: { items: Item[]; d
               <span className="flex-1">{it.title}</span>
             </button>
             <div className={`grid transition-[grid-template-rows] duration-300 ${active ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
-              <div className="overflow-hidden">
+              <div className="overflow-hidden" inert={!active}>
                 <div className="pb-4 pl-[90px] text-sm text-muted">
                   {it.text && <p>{it.text}</p>}
                   {it.items && (
@@ -65,7 +65,7 @@ export function FaqAccordion({ items }: { items: { q: string; html: string }[] }
               </span>
             </button>
             <div className={`grid transition-[grid-template-rows] duration-300 ${active ? "grid-rows-[1fr]" : "grid-rows-[0fr]"}`}>
-              <div className="overflow-hidden">
+              <div className="overflow-hidden" inert={!active}>
                 <div
                   className="max-w-[496px] pb-[30px] text-sm leading-[1.4] text-muted [&_strong]:font-bold"
                   dangerouslySetInnerHTML={{ __html: it.html }}

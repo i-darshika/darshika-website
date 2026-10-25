@@ -1,22 +1,13 @@
-import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import {
-  formatDate,
   posts,
   serviceDetails,
   type Post,
   type ServiceDetail,
 } from "@/data/content";
-import { NumberedAccordion } from "@/components/Accordion";
-import {
-  ArticleHeader,
-  ArticleLayout,
-  RecentNews,
-  ShareRow,
-} from "@/components/Article";
-import { ArrowUpRight } from "@/components/Icons";
+import { ServiceDetailPage } from "@/components/ServiceDetailPage";
+import { BlogPost } from "@/components/BlogPost";
 
 // Service detail pages and blog posts share the site's top-level slugs, as on WordPress.
 type Props = { params: Promise<{ slug: string }> };
@@ -63,77 +54,9 @@ export default async function SlugPage({ params }: Props) {
 }
 
 function ServicePage({ s }: { s: ServiceDetail }) {
-  return (
-    <>
-      <section className="wrap service-detail-header">
-        <span className="eyebrow">Services</span>
-        <h1>
-          {s.titleLines.map((l) => (
-            <span key={l}>{l}</span>
-          ))}
-        </h1>
-        <div className="service-detail-intro">
-          <p>{s.intro}</p>
-          <ul>
-            {s.tags.map((t) => (
-              <li key={t}>{t}</li>
-            ))}
-          </ul>
-        </div>
-        {s.image && (
-          <Image
-            src={s.image}
-            alt={s.title}
-            width={1296}
-            height={865}
-            priority
-            className="service-detail-image"
-          />
-        )}
-      </section>
-      <section className="wrap section-space service-detail-body">
-        <div className="service-offer">
-          <h2>{s.offerHeading}</h2>
-          <div>
-            <p>{s.offerText}</p>
-            <NumberedAccordion items={s.offerItems} />
-          </div>
-        </div>
-        <div className="service-body-copy">
-          {s.body.map((b) => (
-            <p key={b.slice(0, 20)}>{b}</p>
-          ))}
-        </div>
-        <div className="service-offer">
-          <h2>{s.whyHeading}</h2>
-          <div>
-            <p>{s.whyText}</p>
-            <NumberedAccordion items={s.whyItems} />
-          </div>
-        </div>
-        <Link href="/digital-marketing-services" className="button-primary">
-          View all services
-          <ArrowUpRight />
-        </Link>
-      </section>
-    </>
-  );
+  return <ServiceDetailPage s={s} />;
 }
 
 function PostPage({ p }: { p: Post }) {
-  return (
-    <>
-      <ArticleHeader title={p.title} date={formatDate(p.date)} />
-      <ArticleLayout>
-        <div className="article-copy">
-          <div
-            className="prose-wp"
-            dangerouslySetInnerHTML={{ __html: p.html }}
-          />
-          <ShareRow />
-        </div>
-      </ArticleLayout>
-      <RecentNews />
-    </>
-  );
+  return <BlogPost p={p} />;
 }

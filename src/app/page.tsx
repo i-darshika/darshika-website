@@ -9,34 +9,30 @@ import {
   skills,
   traits,
 } from "@/data/site";
-import { formatDate, postsByDate } from "@/data/content";
+import { formatDate, portfolio, postSummaries } from "@/data/content";
 import { DotTags, SectionHead, WordMarquee } from "@/components/Blocks";
 import { ArrowUpRight } from "@/components/Icons";
 import { BlogTabs, type BlogTab } from "@/components/BlogTabs";
-
-const decode = (t: string) =>
-  t.replace(/&amp;/g, "&").replace(/&#8217;|&rsquo;/g, "’").replace(/&nbsp;/g, " ").replace(/&[a-z0-9#]+;/gi, "");
+import { WorkTabs, type WorkTab } from "@/components/WorkTabs";
 
 // Summary data for the blog tabs: trimmed excerpt, read time and the article's section headings.
-const blogTabs: BlogTab[] = postsByDate.map((p) => {
-  const words = p.html.replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length;
-  const raw = decode(p.excerpt.replace(/\s*(…|\[…\]|\.\.\.)\s*$/, "")).trim();
-  // End on the last full sentence (a period after a letter, so "1." list markers don't count).
-  const ends = [...raw.matchAll(/[A-Za-z’)]\.(?=\s|$)/g)].map((m) => (m.index ?? 0) + 2);
-  const cut = ends.length ? ends[ends.length - 1] : 0;
-  const excerpt = cut > 120 ? raw.slice(0, cut) : `${raw}…`;
-  const topics = [...p.html.matchAll(/<h2[^>]*>([\s\S]*?)<\/h2>/g)]
-    .map((m) => decode(m[1].replace(/<[^>]+>/g, "")).replace(/^\d+\.\s*/, "").trim())
-    .filter((t) => t && !/^(introduction|conclusion)$/i.test(t))
-    .slice(0, 4);
-  return {
-    slug: p.slug,
-    title: p.title,
-    date: formatDate(p.date, "short"),
-    readTime: Math.max(1, Math.round(words / 200)),
-    excerpt,
-    topics,
-  };
+const blogTabs: BlogTab[] = postSummaries.map((p) => ({ ...p, date: formatDate(p.date, "short") }));
+
+// Case-study summaries for the portfolio tabs, matched to each home project by its URL slug.
+const workTabs: WorkTab[] = homeWork.flatMap((w) => {
+  const p = portfolio.find((x) => w.href.endsWith(`/${x.slug}`));
+  if (!p) return [];
+  return [
+    {
+      href: w.href,
+      title: w.title,
+      year: w.year,
+      kicker: p.kicker,
+      overview: p.overview[0],
+      meta: p.meta.filter(([k]) => k !== "Client") as [string, string][],
+      highlights: p.highlights,
+    },
+  ];
 });
 
 export default function Home() {
@@ -137,29 +133,7 @@ export default function Home() {
             </>
           }
         />
-        <div className="work-grid">
-          {homeWork.map((w, i) => (
-            <Link href={w.href} key={w.href} className="work-card group">
-              <div className="work-image">
-                <Image
-                  src={w.image}
-                  alt={w.title}
-                  width={800}
-                  height={600}
-                  className="object-cover"
-                />
-                <span className="image-arrow">
-                  <ArrowUpRight />
-                </span>
-              </div>
-              <div className="work-meta">
-                <span>{w.year}</span>
-                <span aria-hidden>0{i + 1}</span>
-              </div>
-              <h3>{w.title}</h3>
-            </Link>
-          ))}
-        </div>
+        <WorkTabs projects={workTabs} />
       </section>
       <section className="expertise-section section-space">
         <div className="wrap">

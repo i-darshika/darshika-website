@@ -1,12 +1,29 @@
 import Image from "next/image";
-import Link from "next/link";
 import type { Metadata } from "next";
-import { serviceRoute, servicesPage } from "@/data/content";
+import { serviceDetails, serviceRoute, servicesPage } from "@/data/content";
 import { PageTitle } from "@/components/Blocks";
 import { FaqAccordion } from "@/components/Accordion";
-import { ArrowUpRight } from "@/components/Icons";
+import { ServiceCards, type ServiceCard } from "@/components/ServiceCards";
 import Testimonials from "@/components/Testimonials";
-export const metadata: Metadata = { title: "Services" };
+export const metadata: Metadata = {
+  title: "Digital Marketing Services",
+  description:
+    "SEO, social media marketing, graphic design and website building services by Darshika Raj.",
+};
+
+// First sentence of each service page's intro, plus its first four offerings.
+const serviceCards: ServiceCard[] = servicesPage.rows.map((r) => {
+  const href = serviceRoute(r.title);
+  const d = serviceDetails.find((x) => href === `/${x.slug}`);
+  const intro = d?.intro.match(/^.*?[.!?](?=\s|$)/)?.[0] ?? r.lines.join(" ");
+  return {
+    num: r.num.replace(/^0(?=\d\d)/, ""),
+    title: r.title,
+    href,
+    intro,
+    offers: (d?.offerItems ?? []).slice(0, 4).map((o) => o.title),
+  };
+});
 export default function ServicesPage() {
   const sp = servicesPage;
   return (
@@ -28,27 +45,8 @@ export default function ServicesPage() {
         <h2 dangerouslySetInnerHTML={{ __html: sp.statementHtml }} />
       </section>
       <section className="wrap services-list section-space">
-        <p className="eyebrow">MY Services</p>
-        <div>
-          {sp.rows.map((r) => (
-            <Link
-              key={r.num}
-              href={serviceRoute(r.title)}
-              className="service-row"
-            >
-              <span className="card-index">{r.num}</span>
-              <h2>{r.title}</h2>
-              <p>
-                {r.lines.map((l) => (
-                  <span key={l}>{l}</span>
-                ))}
-              </p>
-              <span className="image-arrow">
-                <ArrowUpRight />
-              </span>
-            </Link>
-          ))}
-        </div>
+        <p className="eyebrow">My Services</p>
+        <ServiceCards services={serviceCards} />
       </section>
       <section className="light-section section-space">
         <div className="wrap">
