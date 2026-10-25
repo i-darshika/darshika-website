@@ -47,7 +47,7 @@ export default function Footer() {
         </nav>
 
         <div className="foot-base">
-          <p>© {new Date().getFullYear()} Darshika Raj. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Darshika. All rights reserved.</p>
           <Link href="/" className="foot-logo" aria-label="Darshika home">
             <Logo className="is-dark" />
           </Link>
